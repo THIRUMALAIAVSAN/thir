@@ -1,0 +1,314 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Coupons UI Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.brown,
+      ),
+      home: const CouponsPage(),
+    );
+  }
+}
+
+class CouponsPage extends StatelessWidget {
+  const CouponsPage({super.key});
+
+  final List<Map<String, String>> coupons = const [
+    {
+      'price': '₹6,900',
+      'title': 'LONGSTAY',
+      'subtitle': '15% off when you book for 5 days or more and 20% off when you book for 30 days or more.',
+    },
+    {
+      'price': '₹4,500',
+      'title': 'WEEKEND',
+      'subtitle': '10% off for weekend stays. Valid Friday to Sunday.',
+    },
+    {
+      'price': '₹2,200',
+      'title': 'MIDWEEK',
+      'subtitle': '5% off for stays during Monday to Thursday.',
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.brown[700]),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.home, color: Colors.brown[700]),
+            const SizedBox(width: 8),
+            Text('SPACEZ', style: TextStyle(color: Colors.brown[700], fontWeight: FontWeight.w600)),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu, color: Colors.brown[700]),
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text('Coupons', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.brown[800])),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: coupons.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final c = coupons[index];
+                      return CouponCard(
+                        price: c['price']!,
+                        title: c['title']!,
+                        subtitle: c['subtitle']!,
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 90), // space for bottom bar
+              ],
+            ),
+          ),
+
+          // Bottom sticky booking bar
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              color: Colors.transparent,
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // green reward bar
+                  Container(
+                    width: double.infinity,
+                    color: Colors.green[800],
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.card_giftcard, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text('Book now & Unlock exclusive rewards!', style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)],
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('₹19,600', style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.grey[600])),
+                                  const SizedBox(width: 8),
+                                  Text('₹16,000', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text('for 2 nights • 24 Apr - 26 Apr • 8 guests', style: TextStyle(color: Colors.grey[700], fontSize: 12)),
+                            ],
+                          ),
+                        ),
+
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown[700],
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () {
+                            // Optionally navigate to a Reserve/Booking page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const ReservePage()),
+                            );
+                          },
+                          child: const Text('Reserve'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CouponCard extends StatelessWidget {
+  final String price;
+  final String title;
+  final String subtitle;
+
+  const CouponCard({super.key, required this.price, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 110,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)],
+      ),
+      child: Row(
+        children: [
+          // Vertical price strip
+          Container(
+            width: 66,
+            decoration: BoxDecoration(
+              color: Colors.brown[700],
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), bottomLeft: Radius.circular(6)),
+            ),
+            child: Center(
+              child: Transform.rotate(
+                angle: -90 * 3.1415927 / 180,
+                child: Text(
+                  price,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+
+          // Right content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Colors.brown[800])),
+                      TextButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ApplyCouponPage(
+                                couponTitle: title,
+                                couponPrice: price,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: Icon(Icons.wallet_travel, size: 16, color: Colors.brown[700]),
+                        label: Text('Apply', style: TextStyle(color: Colors.brown[700])),
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 30), tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: Text(
+                      subtitle,
+                      style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text('Read more', style: TextStyle(color: Colors.brown[400], fontSize: 13)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Page shown when Apply is tapped
+class ApplyCouponPage extends StatelessWidget {
+  final String couponTitle;
+  final String couponPrice;
+
+  const ApplyCouponPage({super.key, required this.couponTitle, required this.couponPrice});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Apply Coupon"),
+        backgroundColor: Colors.brown[700],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Coupon Applied",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Text("Coupon: $couponTitle", style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 8),
+            Text("Discount/Price: $couponPrice", style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.brown[700],
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Back"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Simple Reserve page for Reserve button navigation
+class ReservePage extends StatelessWidget {
+  const ReservePage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reserve'),
+        backgroundColor: Colors.brown[700],
+      ),
+      body: const Center(
+        child: Text('Reserve flow goes here'),
+      ),
+    );
+  }
+}
